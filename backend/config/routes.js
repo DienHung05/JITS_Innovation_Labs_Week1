@@ -8,4 +8,5 @@ module.exports.routes = {
 
   'POST /wallet/balance': 'WalletController.getBalance',
   'POST /wallet/transfer': 'WalletController.transfer',
+  'POST /wallet/history': 'WalletController.history',
 };

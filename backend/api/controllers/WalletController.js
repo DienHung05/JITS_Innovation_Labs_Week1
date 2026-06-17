@@ -52,11 +52,10 @@ module.exports = {
 
             // Cộng đúng số tiền đã trừ
             try {
-            await pockets.updateOne(
-                { _id: new ObjectId(receiverPocket.id) },
-                { $inc: { balance: money } }
-            );
-            return res.ok({ message: 'Chuyển tiền thành công' });
+                await pockets.updateOne(
+                    { _id: new ObjectId(receiverPocket.id) },
+                    { $inc: { balance: money } }
+                );
             } catch (creditErr) {
                 // Cộng tiền thất bại, hoàn lại tiền cho người gửi
                 await pockets.updateOne(
@@ -84,6 +83,43 @@ module.exports = {
                 amount: money,
                 balance: newSender.balance, // Số dư sau khi trừ của người gửi
             });
+        } catch (e) {
+            return res.serverError(e);
+        }
+    },
+
+    // Lịch sử giao dịch
+    history: async function (req, res) {
+        try {
+            const myId = req.session.userId;
+
+            // Lấy tất cả giao dịch liên quan đến người dùng
+            const txs = await Transaction.find({
+                or: [
+                    { sender: myId },
+                    { receiver: myId }
+                ]
+            }).sort('createdAt DESC');
+
+            // Tra sđt của các đối tác trong giao dịch
+            const ids = [...new Set(txs.flatMap(t => [t.sender, t.receiver]))];
+            const customers = await Customer.find({ id: ids });
+            const phoneById = {};
+            customers.forEach(c => { phoneById[c.id] = c.phone; });
+
+            const transactions = txs.map(t => {
+                const isSender = String(t.sender) === String(myId);
+                return {
+                    id: t.id,
+                    type: isSender ? 'OUT' : 'IN',
+                    amount: t.amount,
+                    counterparty: isSender ? phoneById[t.receiver] : phoneById[t.sender],
+                    balanceAfter: isSender ? t.senderBalanceAfter : t.receiverBalanceAfter,
+                    createdAt: t.createdAt,
+                };
+            });
+
+            return res.ok({ transactions });
         } catch (e) {
             return res.serverError(e);
         }
