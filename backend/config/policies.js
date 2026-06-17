@@ -12,4 +12,10 @@ module.exports.policies = {
     'logout': 'isLoggedIn',
     'me': 'isLoggedIn',
   },
+
+  'WalletController': {
+    getBalance: 'isLoggedIn',
+    transfer: 'isLoggedIn',
+  },
+
 };

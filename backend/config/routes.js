@@ -5,4 +5,7 @@ module.exports.routes = {
   'POST /auth/login': 'AuthController.login',
   'POST /auth/logout': 'AuthController.logout',
   'POST /auth/me': 'AuthController.me',
+
+  'POST /wallet/balance': 'WalletController.getBalance',
+  'POST /wallet/transfer': 'WalletController.transfer',
 };
