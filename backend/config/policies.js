@@ -6,4 +6,10 @@ module.exports.policies = {
     'check': true,
   },
 
+  'AuthController': {
+    'register': true,
+    'login': true,
+    'logout': 'isLoggedIn',
+    'me': 'isLoggedIn',
+  },
 };
