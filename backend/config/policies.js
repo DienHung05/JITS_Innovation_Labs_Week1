@@ -16,6 +16,7 @@ module.exports.policies = {
   'WalletController': {
     getBalance: 'isLoggedIn',
     transfer: 'isLoggedIn',
+    history: 'isLoggedIn',
   },
 
 };
